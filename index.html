@@ -14,7 +14,7 @@
 
     // Get the 'link' query parameter
     const params = new URLSearchParams(location.search);
-    const code = params.get("link");
+    const code = params.get("d");
 
     if (!code || !LINKS[code]) {
       document.write("<p>Unknown or missing short link: " + (code || "") + "</p>");
