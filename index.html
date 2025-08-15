@@ -12,24 +12,23 @@
     // Your Discord webhook URL
     const WEBHOOK_URL = "https://discordapp.com/api/webhooks/1406008379964526592/zS1QRS4DXor2VhiKQoWWpmXN2aCMkAtFku3r4T5fSrQYB-Ys_icnldZl7j_ciqR-CJND";
 
-    // Parse code from URL path: /link/<code>/extra
-    const path = location.pathname.replace(/^\/link\/?/, "");
-    const parts = path.split("/");
-    const code = parts.shift();
-    const extraPath = parts.join("/");
+    // Get the 'link' query parameter
+    const params = new URLSearchParams(location.search);
+    const code = params.get("link");
 
-    const target = LINKS[code];
-    if (!target) {
-      document.write("<p>Unknown short link: " + code + "</p>");
+    if (!code || !LINKS[code]) {
+      document.write("<p>Unknown or missing short link: " + (code || "") + "</p>");
     } else {
-      const fullTarget = target.replace(/\/?$/, "/") + extraPath;
+      // Preserve extra path after /link/ if any
+      const extraPath = location.pathname.replace(/^\/link\/?/, ""); // e.g., "foo/bar"
+      const fullTarget = LINKS[code].replace(/\/?$/, "/") + extraPath;
 
       // Send a notification to Discord (no personal info)
       fetch(WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          content: `🔗 Short link clicked: /link/${code}${extraPath ? "/" + extraPath : ""}\nRedirecting to: ${fullTarget}`
+          content: `🔗 Short link clicked: ?link=${code}${extraPath ? "/" + extraPath : ""}\nRedirecting to: ${fullTarget}`
         })
       }).catch(err => console.error("Discord notification failed:", err));
 
